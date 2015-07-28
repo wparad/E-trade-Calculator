@@ -1,5 +1,6 @@
 language: csharp
 script:
+- rake --trace
 - ls -lR
 deploy:
   skip_cleanup: true
