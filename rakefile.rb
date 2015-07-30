@@ -15,7 +15,6 @@ VERSION = "#{match && match[1] ? match[1] : '0.0'}.#{ENV['TRAVIS_BUILD_NUMBER']}
 PACKAGE_DIR = File.join(PWD, 'package')
 
 directory OUTPUT_DIR
-directory PACKAGE_DIR
 
 desc 'Build the solution.'
 task :build => [OUTPUT_DIR] do
@@ -25,7 +24,7 @@ end
 
 task :default => [:build, :create_nuget_package, :create_git_tag]
 
-task :create_nuget_package => [PACKAGE_DIR] do
+task :create_nuget_package do
   Dir.mktmpdir do |tmp|
     nuspec = File.join(tmp, 'Microservice.nuspec')
     File.write(nuspec, "<?xml version=\"1.0\" encoding=\"utf-8\"?>
@@ -40,7 +39,7 @@ task :create_nuget_package => [PACKAGE_DIR] do
     <description>ETrade Service in F#</description>
   </metadata>
   <files>
-    <file src=\"package/**/*.*\" target=\".\" />
+    <file src=\"#{File.basename(PACKAGE_DIR)}/**/*.*\" target=\".\" />
   </files>
 </package>
 ")
