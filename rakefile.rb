@@ -12,19 +12,20 @@ SOLUTION_SLN = Dir[File.join(PWD, '*.sln')].first
 GIT_REPOSITORY = %x[git config --get remote.origin.url].split('://')[1]
 match = (ENV['TRAVIS_BRANCH'] || '').match(/^release\/(.*)$/)
 VERSION = "#{match && match[1] ? match[1] : '0.0'}.#{ENV['TRAVIS_BUILD_NUMBER']}"
+PACKAGE_DIR = File.join(PWD, 'package')
 
 directory OUTPUT_DIR
+directory PACKAGE_DIR
 
 desc 'Build the solution.'
 task :build => [OUTPUT_DIR] do
   raise 'Nuget restore failed' if !system("nuget restore #{SOLUTION_SLN}")
-  system('nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner')
   raise 'Build failed' if !system("xbuild /p:Configuration=Release #{SOLUTION_SLN}")
 end
 
 task :default => [:build, :create_nuget_package, :create_git_tag]
 
-task :create_nuget_package do
+task :create_nuget_package => [PACKAGE_DIR] do
   Dir.mktmpdir do |tmp|
     nuspec = File.join(tmp, 'Microservice.nuspec')
     File.write(nuspec, "<?xml version=\"1.0\" encoding=\"utf-8\"?>
