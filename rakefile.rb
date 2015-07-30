@@ -39,7 +39,7 @@ task :create_nuget_package do
     <description>ETrade Service in F#</description>
   </metadata>
   <files>
-    <file src=\"#{File.basename(PACKAGE_DIR)}/**/*.*\" target=\".\" />
+    <file src=\"#{File.basename(PACKAGE_DIR)}/**/*.*\" target=\"lib/net45\" />
   </files>
 </package>
 ")
