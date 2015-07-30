@@ -6,7 +6,7 @@ deploy:
   skip_cleanup: true
   provider: releases
   file_glob: true
-  file: output/*.nupkg
+  file: output/*.*
   on:
     tags: false
     all_branches: true

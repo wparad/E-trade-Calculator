@@ -22,10 +22,10 @@ task :build => [OUTPUT_DIR] do
   raise 'Build failed' if !system("xbuild /p:Configuration=Release #{SOLUTION_SLN}")
 end
 
-task :default => [:build, :calculate_stock, :create_nuget_package, :create_git_tag]
+task :default => [:build, :calculate_stock, :create_git_tag]
 
 task :calculate_stock do
-  File.write(File.join(PACKAGE_DIR, 'output.txt'), "Stocks")
+  File.write(File.join(OUTPUT_DIR, 'output.txt'), "Stocks")
 end
 
 task :create_nuget_package do
