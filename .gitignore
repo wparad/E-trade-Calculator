@@ -27,6 +27,10 @@
 *.out
 *.app
 
-secrets.yaml
+secrets
+secrets.*
 packages
 *.userprefs
+*.*~
+bin
+obj
