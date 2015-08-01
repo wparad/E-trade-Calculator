@@ -26,5 +26,13 @@ namespace Calculator
 
 		[JsonProperty("password")]
 		public string Password {get; set;}
+
+		public Secret()
+		{
+			Key = System.Environment.GetEnvironmentVariable("ETRADE_OAUTH_CONSUMER_KEY");
+			ConsumerSecret = System.Environment.GetEnvironmentVariable("ETRADE_CONSUMER_SECRET");
+			Username = System.Environment.GetEnvironmentVariable("ETRADE_USERNAME");
+			Password = System.Environment.GetEnvironmentVariable("ETRADE_PASSWORD");
+		}
 	}
 }

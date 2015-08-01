@@ -42,22 +42,9 @@ namespace Calculator
 
 			var authorize_client = new RestClient(EnvironmentProvider.Sandbox.AuthorizeEndpoint);
 			request = new RestRequest(false ? "" : "e/t/etws/authorize");
-			//
 
 			request.AddParameter("token", oauth_token);
 			request.AddParameter("key", consumerKey);
-			var url = authorize_client.BuildUri(request).ToString();
-			Process.Start(url);
-
-			response = authorize_client.Execute(request);
-			if(response.StatusCode != HttpStatusCode.OK)
-			{
-				Console.WriteLine("{0} {1}: {2}", response.StatusCode, response.StatusDescription, response.Content);
-				return;
-			}
-
-			request = new RestRequest(string.Format("e/t/etws/login.fcc?USER={0}&PASSWORD={1}&Target={2}", secret.Username, secret.Password,
-				System.Uri.EscapeDataString(string.Format("/e/t/etws/authorize?token={0}&key={1}", oauth_token, consumerKey))));
 			//var url = authorize_client.BuildUri(request).ToString();
 			//Process.Start(url);
 
@@ -68,6 +55,25 @@ namespace Calculator
 				return;
 			}
 
+			request = new RestRequest("login.fcc");
+			request.AddParameter("USER", secret.Username);
+			request.AddParameter("PASSWORD", secret.Password);
+			request.AddParameter("TARGET", System.Uri.EscapeDataString(string.Format("/e/t/user/xfr?Target=/e/t/etws/authorize?token={0}&key={1}", oauth_token, consumerKey)));
+			request.AddParameter("txtPassword", "Password");
+			request.AddParameter(new Parameter{Name = "Logon"});
+			request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
+			//var url = authorize_client.BuildUri(request).ToString();
+			//Process.Start(url);
+
+			//This request is supposed to return the webpage tha contains the verification code, but I suspect that the current cookies need to passed to this request from the previous header.
+			response = authorize_client.Execute(request);
+			if(response.StatusCode != HttpStatusCode.OK)
+			{
+				Console.WriteLine("{0} {1}: {2}", response.StatusCode, response.StatusDescription, response.Content);
+				return;
+			}
+
+			//Get the verification code, this part hasn't been tested
 			request = new RestRequest(false ? "" : "e/t/etws/TradingAPICustomerInfo");
 			response = authorize_client.Execute(request);
 			if(response.StatusCode != HttpStatusCode.OK)
@@ -76,6 +82,7 @@ namespace Calculator
 				return;
 			}
 
+			//set the verifier code and continue to get the real access token
 			var verifier = "C4H2T"; // <-- Breakpoint here (set verifier in debugger)
 			request = new RestRequest(true ? "" : "access_token", Method.POST);
 			oauth_client.Authenticator = OAuth1Authenticator.ForAccessToken(
